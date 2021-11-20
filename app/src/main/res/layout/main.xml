@@ -3,32 +3,52 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:weightSum="10"
+    >
     <Button
+        android:layout_weight="0.1"
         android:id="@+id/recognize_file"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/recognize_file"/>
 
     <Button
+        android:layout_weight="0.1"
         android:id="@+id/recognize_mic"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/recognize_microphone"/>
 
     <ToggleButton
+        android:layout_weight="0.1"
         android:id="@+id/pause"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textOff="@string/pause"
         android:textOn="@string/continueRecognition"/>
 
+        <TextView
+            android:padding="10dp"
+            android:textStyle="bold"
+            android:text="Inference and Record / Word :"
+            android:id="@+id/inf_rec_time"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:scrollbars="vertical"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <TextView
+        android:layout_weight="8"
         android:id="@+id/result_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="bottom"
         android:scrollbars="vertical"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+
 
 </LinearLayout>

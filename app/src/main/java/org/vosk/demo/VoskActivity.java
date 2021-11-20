@@ -17,8 +17,10 @@ package org.vosk.demo;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -34,8 +36,10 @@ import org.vosk.android.StorageService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -55,14 +59,21 @@ public class VoskActivity extends Activity implements
     private SpeechService speechService;
     private SpeechStreamService speechStreamService;
     private TextView resultView;
+    private TextView infandrec_time;
+    private boolean RESET_RESULT = false;
+    private long starttime;
+    private long endtime;
+    private long inf_rec_time; //record + analyse(inference): har dota tavasot onPartialResult anjam mishan va ghabele tafkik nistan.
+    private int count = 0;
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.main);
-
+        Log.v("result", "onCreate");
         // Setup layout
         resultView = findViewById(R.id.result_text);
+        infandrec_time = findViewById(R.id.inf_rec_time);
         setUiState(STATE_START);
 
         findViewById(R.id.recognize_file).setOnClickListener(view -> recognizeFile());
@@ -81,6 +92,7 @@ public class VoskActivity extends Activity implements
     }
 
     private void initModel() {
+        Log.v("result", "initModel");
         StorageService.unpack(this, "model-en-us", "model",
                 (model) -> {
                     this.model = model;
@@ -94,7 +106,7 @@ public class VoskActivity extends Activity implements
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
+        Log.v("result", "onRequestPermissionsResult");
         if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Recognizer initialization is a time-consuming and it involves IO,
@@ -108,6 +120,7 @@ public class VoskActivity extends Activity implements
 
     @Override
     public void onDestroy() {
+        Log.v("result", "onDestroy");
         super.onDestroy();
 
         if (speechService != null) {
@@ -120,14 +133,35 @@ public class VoskActivity extends Activity implements
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onResult(String hypothesis) {
+        Log.v("result", "onResult");
+        endtime =  new Date().getTime();
         resultView.append(hypothesis + "\n");
+        Log.v("result", "result" + hypothesis);
+        Log.v("result", "endtime" + endtime);
+
+        inf_rec_time = endtime - starttime;
+
+
+        String[] splited = hypothesis.split("\\s+");
+        long totalCharacters = hypothesis.chars().count();
+        int num_of_words = splited.length;
+        int inf_rec_per_word = (int) (inf_rec_time / num_of_words);
+        int inf_per_char = (int) (inf_rec_time / totalCharacters);
+
+        Log.v("result", "inf_time/word: " + inf_rec_per_word);
+        infandrec_time.setText("Inference and Record / Word : " + inf_rec_per_word + " ms");
+
+
+        count = 0;
     }
 
     @Override
     public void onFinalResult(String hypothesis) {
         resultView.append(hypothesis + "\n");
+        Log.v("result", "onFinalResult");
         setUiState(STATE_DONE);
         if (speechStreamService != null) {
             speechStreamService = null;
@@ -136,6 +170,12 @@ public class VoskActivity extends Activity implements
 
     @Override
     public void onPartialResult(String hypothesis) {
+        if(!hypothesis.equals("") && count==0){
+           starttime =  new Date().getTime();
+            Log.v("result", "starttime"+starttime);
+           count += 1;
+        }
+        Log.v("result", "partial" + hypothesis);
         resultView.append(hypothesis + "\n");
     }
 
@@ -146,10 +186,12 @@ public class VoskActivity extends Activity implements
 
     @Override
     public void onTimeout() {
+        Log.v("result", "timeout");
         setUiState(STATE_DONE);
     }
 
     private void setUiState(int state) {
+        Log.v("result", "setUiState");
         switch (state) {
             case STATE_START:
                 resultView.setText(R.string.preparing);
@@ -192,6 +234,7 @@ public class VoskActivity extends Activity implements
     }
 
     private void setErrorState(String message) {
+        Log.v("result", "setErrorState");
         resultView.setText(message);
         ((Button) findViewById(R.id.recognize_mic)).setText(R.string.recognize_microphone);
         findViewById(R.id.recognize_file).setEnabled(false);
@@ -199,6 +242,7 @@ public class VoskActivity extends Activity implements
     }
 
     private void recognizeFile() {
+        Log.v("result", "recognizeFile");
         if (speechStreamService != null) {
             setUiState(STATE_DONE);
             speechStreamService.stop();
@@ -222,6 +266,7 @@ public class VoskActivity extends Activity implements
     }
 
     private void recognizeMicrophone() {
+        Log.v("result", "recognizeMicrophone");
         if (speechService != null) {
             setUiState(STATE_DONE);
             speechService.stop();
@@ -240,6 +285,7 @@ public class VoskActivity extends Activity implements
 
 
     private void pause(boolean checked) {
+        Log.v("result", "pause");
         if (speechService != null) {
             speechService.setPause(checked);
         }
