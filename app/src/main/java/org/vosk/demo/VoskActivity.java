@@ -34,6 +34,11 @@ import org.vosk.android.SpeechService;
 import org.vosk.android.SpeechStreamService;
 import org.vosk.android.StorageService;
 
+import org.vosk.demo.COMMANDREC;
+
+import java.util.* ;
+import java.util.ArrayList;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -65,6 +70,7 @@ public class VoskActivity extends Activity implements
     private long endtime;
     private long inf_rec_time; //record + analyse(inference): har dota tavasot onPartialResult anjam mishan va ghabele tafkik nistan.
     private int count = 0;
+    COMMANDREC find_required_madule = new COMMANDREC();
 
     @Override
     public void onCreate(Bundle state) {
@@ -81,6 +87,10 @@ public class VoskActivity extends Activity implements
         ((ToggleButton) findViewById(R.id.pause)).setOnCheckedChangeListener((view, isChecked) -> pause(isChecked));
 
         LibVosk.setLogLevel(LogLevel.INFO);
+
+
+        //Log.v("result123", "resulttt: " +find_required_madule.find_madule_and_object("Where is my book") );
+
 
         // Check if user has given permission to record audio, init the model after permission is granted
         int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
@@ -136,11 +146,17 @@ public class VoskActivity extends Activity implements
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onResult(String hypothesis) {
-        Log.v("result", "onResult");
+        String answer;
+        String[] res = hypothesis.split("\"");
+        Log.v("GHT", "GHT: "+ res[3]);
+
+        if(res[3].split(" ").length > 1){
+            answer = find_required_madule.find_madule_and_object(res[3]);
+        }else {
+            answer = "Please, Repeat Your Command!";
+        }
         endtime =  new Date().getTime();
         resultView.append(hypothesis + "\n");
-        Log.v("result", "result" + hypothesis);
-        Log.v("result", "endtime" + endtime);
 
         inf_rec_time = endtime - starttime;
 
@@ -150,22 +166,22 @@ public class VoskActivity extends Activity implements
         int num_of_words = splited.length;
         int inf_rec_per_word = (int) (inf_rec_time / num_of_words);
         int inf_per_char = (int) (inf_rec_time / totalCharacters);
-
-        Log.v("result", "inf_time/word: " + inf_rec_per_word);
         infandrec_time.setText("Inference and Record / Word : " + inf_rec_per_word + " ms");
-
 
         count = 0;
     }
 
     @Override
     public void onFinalResult(String hypothesis) {
+        Log.v("findresult", hypothesis);
         resultView.append(hypothesis + "\n");
+
         Log.v("result", "onFinalResult");
         setUiState(STATE_DONE);
         if (speechStreamService != null) {
             speechStreamService = null;
         }
+
     }
 
     @Override
@@ -176,6 +192,7 @@ public class VoskActivity extends Activity implements
            count += 1;
         }
         Log.v("result", "partial" + hypothesis);
+        //Log.v("findresult", hypothesis);
         resultView.append(hypothesis + "\n");
     }
 
