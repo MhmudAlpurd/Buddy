@@ -37,7 +37,7 @@ public class COMMANDREC {
 
 
         // Secondary_Keywords!
-        String[] text_reading_secondary_keywords = {"cash", "call", "label", "catch"};
+        String[] text_reading_secondary_keywords = {"cash", "call", "label", "catch", "card", "court"};
         List<String> text_reading_secondary_keywords_lst = Arrays.asList(text_reading_secondary_keywords);
 
         String[] finding_object_secondary_keyworkds = {"is", "my"};
@@ -48,7 +48,7 @@ public class COMMANDREC {
 
 
         //MADULES LIST
-        String[] madules_names = {"Text Reading", "Finding Object", "Scene Discription"};
+        String[] madules_names = {"Text Reading", "Finding Object", "Scene Description"};
         List<String> madules_names_lst = Arrays.asList(madules_names);
 
 
@@ -130,7 +130,7 @@ public class COMMANDREC {
                             break;
                         default:
                             FINAL_MADULE = madules_names[FINAL_MADULE_IDX];
-                            FINAL_RESULT = FINAL_MADULE + " " + FINAL_OBJECT ;
+                            FINAL_RESULT = FINAL_MADULE + "|" + FINAL_OBJECT ;
                             pr(FINAL_RESULT);
                             break;
                     }
@@ -198,8 +198,12 @@ public class COMMANDREC {
             if(String.valueOf(i).equals("my") & wrd_idx != (lst.size()-1)){
                 userObject = lst.get(wrd_idx + 1).toString();
                 break;
+            }else if (String.valueOf(i).equals("the") & wrd_idx != (lst.size()-1)){
+                userObject = lst.get(wrd_idx + 1).toString();
+                break;
             }else{
-                userObject = "nothing";
+                userObject = lst.get( lst.size() - 1).toString();
+                break;
             }
         }
         return (userObject);

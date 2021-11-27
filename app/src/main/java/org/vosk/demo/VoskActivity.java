@@ -63,13 +63,9 @@ public class VoskActivity extends Activity implements
     private Model model;
     private SpeechService speechService;
     private SpeechStreamService speechStreamService;
-    private TextView resultView;
-    private TextView infandrec_time;
-    private boolean RESET_RESULT = false;
-    private long starttime;
-    private long endtime;
-    private long inf_rec_time; //record + analyse(inference): har dota tavasot onPartialResult anjam mishan va ghabele tafkik nistan.
-    private int count = 0;
+    private TextView moduletask;
+    private TextView modulename;
+    private TextView recievedcommand;
     COMMANDREC find_required_madule = new COMMANDREC();
 
     @Override
@@ -78,11 +74,13 @@ public class VoskActivity extends Activity implements
         setContentView(R.layout.main);
         Log.v("result", "onCreate");
         // Setup layout
-        resultView = findViewById(R.id.result_text);
-        infandrec_time = findViewById(R.id.inf_rec_time);
+        moduletask = findViewById(R.id.txt_moduletask);
+        modulename = findViewById(R.id.txt_madulename);
+        recievedcommand = findViewById(R.id.txt_recievedcommand);
+
         setUiState(STATE_START);
 
-        findViewById(R.id.recognize_file).setOnClickListener(view -> recognizeFile());
+        //findViewById(R.id.recognize_file).setOnClickListener(view -> recognizeFile());
         findViewById(R.id.recognize_mic).setOnClickListener(view -> recognizeMicrophone());
         ((ToggleButton) findViewById(R.id.pause)).setOnCheckedChangeListener((view, isChecked) -> pause(isChecked));
 
@@ -146,37 +144,14 @@ public class VoskActivity extends Activity implements
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onResult(String hypothesis) {
-        String answer;
-        String[] res = hypothesis.split("\"");
-        Log.v("GHT", "GHT: "+ res[3]);
+        analyze_hypo(hypothesis);
+       // resultView.append(hypothesis + "\n");
 
-        if(res[3].split(" ").length > 1){
-            answer = find_required_madule.find_madule_and_object(res[3]);
-        }else {
-            answer = "Please, Repeat Your Command!";
-        }
-        endtime =  new Date().getTime();
-        resultView.append(hypothesis + "\n");
-
-        inf_rec_time = endtime - starttime;
-
-
-        String[] splited = hypothesis.split("\\s+");
-        long totalCharacters = hypothesis.chars().count();
-        int num_of_words = splited.length;
-        int inf_rec_per_word = (int) (inf_rec_time / num_of_words);
-        int inf_per_char = (int) (inf_rec_time / totalCharacters);
-        infandrec_time.setText("Inference and Record / Word : " + inf_rec_per_word + " ms");
-
-        count = 0;
     }
 
     @Override
     public void onFinalResult(String hypothesis) {
-        Log.v("findresult", hypothesis);
-        resultView.append(hypothesis + "\n");
-
-        Log.v("result", "onFinalResult");
+        //resultView.append(hypothesis + "\n");
         setUiState(STATE_DONE);
         if (speechStreamService != null) {
             speechStreamService = null;
@@ -186,14 +161,7 @@ public class VoskActivity extends Activity implements
 
     @Override
     public void onPartialResult(String hypothesis) {
-        if(!hypothesis.equals("") && count==0){
-           starttime =  new Date().getTime();
-            Log.v("result", "starttime"+starttime);
-           count += 1;
-        }
-        Log.v("result", "partial" + hypothesis);
-        //Log.v("findresult", hypothesis);
-        resultView.append(hypothesis + "\n");
+       // resultView.append(hypothesis + "\n");
     }
 
     @Override
@@ -211,37 +179,37 @@ public class VoskActivity extends Activity implements
         Log.v("result", "setUiState");
         switch (state) {
             case STATE_START:
-                resultView.setText(R.string.preparing);
-                resultView.setMovementMethod(new ScrollingMovementMethod());
-                findViewById(R.id.recognize_file).setEnabled(false);
+                //resultView.setText(R.string.preparing);
+                //resultView.setMovementMethod(new ScrollingMovementMethod());
+                //findViewById(R.id.recognize_file).setEnabled(false);
                 findViewById(R.id.recognize_mic).setEnabled(false);
                 findViewById(R.id.pause).setEnabled((false));
                 break;
             case STATE_READY:
-                resultView.setText(R.string.ready);
+                //resultView.setText(R.string.ready);
                 ((Button) findViewById(R.id.recognize_mic)).setText(R.string.recognize_microphone);
-                findViewById(R.id.recognize_file).setEnabled(true);
+                //findViewById(R.id.recognize_file).setEnabled(true);
                 findViewById(R.id.recognize_mic).setEnabled(true);
                 findViewById(R.id.pause).setEnabled((false));
                 break;
             case STATE_DONE:
-                ((Button) findViewById(R.id.recognize_file)).setText(R.string.recognize_file);
+                //((Button) findViewById(R.id.recognize_file)).setText(R.string.recognize_file);
                 ((Button) findViewById(R.id.recognize_mic)).setText(R.string.recognize_microphone);
-                findViewById(R.id.recognize_file).setEnabled(true);
+                //findViewById(R.id.recognize_file).setEnabled(true);
                 findViewById(R.id.recognize_mic).setEnabled(true);
                 findViewById(R.id.pause).setEnabled((false));
                 break;
             case STATE_FILE:
-                ((Button) findViewById(R.id.recognize_file)).setText(R.string.stop_file);
-                resultView.setText(getString(R.string.starting));
+                //((Button) findViewById(R.id.recognize_file)).setText(R.string.stop_file);
+                //resultView.setText(getString(R.string.starting));
                 findViewById(R.id.recognize_mic).setEnabled(false);
-                findViewById(R.id.recognize_file).setEnabled(true);
+                //findViewById(R.id.recognize_file).setEnabled(true);
                 findViewById(R.id.pause).setEnabled((false));
                 break;
             case STATE_MIC:
                 ((Button) findViewById(R.id.recognize_mic)).setText(R.string.stop_microphone);
-                resultView.setText(getString(R.string.say_something));
-                findViewById(R.id.recognize_file).setEnabled(false);
+                //resultView.setText(getString(R.string.say_something));
+                //findViewById(R.id.recognize_file).setEnabled(false);
                 findViewById(R.id.recognize_mic).setEnabled(true);
                 findViewById(R.id.pause).setEnabled((true));
                 break;
@@ -252,9 +220,9 @@ public class VoskActivity extends Activity implements
 
     private void setErrorState(String message) {
         Log.v("result", "setErrorState");
-        resultView.setText(message);
+        //resultView.setText(message);
         ((Button) findViewById(R.id.recognize_mic)).setText(R.string.recognize_microphone);
-        findViewById(R.id.recognize_file).setEnabled(false);
+        //findViewById(R.id.recognize_file).setEnabled(false);
         findViewById(R.id.recognize_mic).setEnabled(false);
     }
 
@@ -306,6 +274,50 @@ public class VoskActivity extends Activity implements
         if (speechService != null) {
             speechService.setPause(checked);
         }
+    }
+
+    private void analyze_hypo(String hypothesis){
+        String answer;
+        String[] res = hypothesis.split("\"");
+
+        if(res[3].split(" ").length > 1){
+            answer = find_required_madule.find_madule_and_object(res[3]);
+            String[] result = answer.split("\\|");
+            if(result.length > 1) {
+                String MODULE_NAME = result[0];
+                switch (MODULE_NAME){
+                    case "Text Reading":
+                        modulename.setText(result[0] + " module is running!");
+                        moduletask.setText("Reading ...");
+                        recievedcommand.setText("Recognized command: " + res[3]);
+                        break;
+                    case "Scene Description":
+                        modulename.setText(result[0] + " module is running!");
+                        moduletask.setText("Describing the scene");
+                        recievedcommand.setText("Recognized command: " + res[3]);
+                        break;
+                case "Finding Object":
+                    modulename.setText(result[0] + " module is running!");
+                    moduletask.setText("Finding the "+ result[1]);
+                    recievedcommand.setText("Recognized command: " + res[3]);
+                    break;
+                default:
+                    modulename.setText("Appropriate Module");
+                    moduletask.setText("What Needs To Be Done?");
+                    recievedcommand.setText("Recieved Text From User");
+
+            }
+            }else {
+            modulename.setText("No modules enabled");
+            moduletask.setText("Repeat Your Command!");
+            recievedcommand.setText("Recognized command: " + res[3]);
+        }
+
+    }else {
+            modulename.setText("No modules enabled");
+            moduletask.setText("Repeat Your Command!");
+            recievedcommand.setText("Recognized command: " + res[3]);
+    }
     }
 
 }

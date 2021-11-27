@@ -3,7 +3,7 @@
 
     <string name="app_name">Vosk Demo</string>
     <string name="recognize_file">Recognize File</string>
-    <string name="recognize_microphone">Recognize Microphone</string>
+    <string name="recognize_microphone">Start Microphone</string>
     <string name="stop_microphone">Stop Microphone</string>
     <string name="preparing">Preparing the recognizer\n</string>
     <string name="ready">Ready\n</string>
@@ -14,5 +14,8 @@
     <string name="stop_file">Stop File</string>
     <string name="pause">Pause</string>
     <string name="continueRecognition">Continue</string>
+    <string name="kendrick">Kendrick</string>
+    <string name="already_have_an_account">Already have an account?</string>
+
 
 </resources>
