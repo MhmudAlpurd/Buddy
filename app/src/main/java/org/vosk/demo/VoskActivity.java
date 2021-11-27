@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -45,6 +46,7 @@ import java.util.Date;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -66,17 +68,20 @@ public class VoskActivity extends Activity implements
     private TextView moduletask;
     private TextView modulename;
     private TextView recievedcommand;
+    private ImageView img_module;
     COMMANDREC find_required_madule = new COMMANDREC();
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
+
         setContentView(R.layout.main);
         Log.v("result", "onCreate");
         // Setup layout
         moduletask = findViewById(R.id.txt_moduletask);
         modulename = findViewById(R.id.txt_madulename);
         recievedcommand = findViewById(R.id.txt_recievedcommand);
+        img_module = findViewById(R.id.img_module);
 
         setUiState(STATE_START);
 
@@ -290,33 +295,39 @@ public class VoskActivity extends Activity implements
                         modulename.setText(result[0] + " module is running!");
                         moduletask.setText("Reading ...");
                         recievedcommand.setText("Recognized command: " + res[3]);
+                        img_module.setBackgroundResource(R.drawable.text_reading_2);
                         break;
                     case "Scene Description":
                         modulename.setText(result[0] + " module is running!");
                         moduletask.setText("Describing the scene");
                         recievedcommand.setText("Recognized command: " + res[3]);
+                        img_module.setBackgroundResource(R.drawable.scene_desc);
                         break;
                 case "Finding Object":
                     modulename.setText(result[0] + " module is running!");
                     moduletask.setText("Finding the "+ result[1]);
                     recievedcommand.setText("Recognized command: " + res[3]);
+                    img_module.setBackgroundResource(R.drawable.obj_detection);
                     break;
                 default:
                     modulename.setText("Appropriate Module");
                     moduletask.setText("What Needs To Be Done?");
                     recievedcommand.setText("Recieved Text From User");
+                    img_module.setBackgroundResource(R.drawable.question);
 
             }
             }else {
             modulename.setText("No modules enabled");
             moduletask.setText("Repeat Your Command!");
             recievedcommand.setText("Recognized command: " + res[3]);
+            img_module.setBackgroundResource(R.drawable.question);
         }
 
     }else {
             modulename.setText("No modules enabled");
             moduletask.setText("Repeat Your Command!");
             recievedcommand.setText("Recognized command: " + res[3]);
+            img_module.setBackgroundResource(R.drawable.question);
     }
     }
 

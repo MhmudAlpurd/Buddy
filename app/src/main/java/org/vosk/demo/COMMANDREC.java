@@ -1,4 +1,6 @@
 package org.vosk.demo;
+import android.util.Log;
+
 import java.util.* ;
 import java.util.ArrayList;
 
@@ -32,12 +34,12 @@ public class COMMANDREC {
         String[] finding_object_main_keyworkds ={"where", "what", "there", "here", "wear", "burn", "wear"};
         List<String> finding_object_main_keyworks_lst = Arrays.asList(finding_object_main_keyworkds);
 
-        String[] scene_description_main_keywords ={"explain", "explaining", "explore", "exploring", "explode", "explicit", "expand", "express", "explainit"};
+        String[] scene_description_main_keywords ={"explain","explained", "explaining", "explore", "exploring", "explode", "explicit", "expand", "express", "explainit"};
         List<String> scene_description_main_keyworks_lst = Arrays.asList(scene_description_main_keywords);
 
 
         // Secondary_Keywords!
-        String[] text_reading_secondary_keywords = {"cash", "call", "label", "catch", "card", "court"};
+        String[] text_reading_secondary_keywords = {"cash", "call", "label", "catch", "card", "court", "labor", "labour"};
         List<String> text_reading_secondary_keywords_lst = Arrays.asList(text_reading_secondary_keywords);
 
         String[] finding_object_secondary_keyworkds = {"is", "my"};
@@ -96,20 +98,24 @@ public class COMMANDREC {
                     //TODO: check second word!
                     second_word = result_words_lst.get(1).toLowerCase().trim();
                     int idx_2 = find_madule_index(main_lst_names_lst, second_word);
+                    Log.v("secondword", "" + idx_2);
                     switch(idx_2){
                         case -1:
                             FINAL_RESULT = REPEAT_MESSAGE;
                             break;
                         default:
                             int response = double_check(result_words_lst, second_word , secondary_lst_names_lst, idx_2);
+                            Log.v("secondword", "" + response);
                             switch(response){
                                 case -1:
                                     pr(REPEAT_MESSAGE);
                                     FINAL_RESULT = REPEAT_MESSAGE;
                                     break;
                                 default:
+                                    Log.v("secondword", "" + FINAL_MADULE_IDX);
                                     FINAL_MADULE = madules_names[FINAL_MADULE_IDX];
-                                    FINAL_RESULT = FINAL_MADULE + " " + FINAL_OBJECT ;
+                                    Log.v("secondword", "" + FINAL_MADULE);
+                                    FINAL_RESULT = FINAL_MADULE + "|" + FINAL_OBJECT ;
                                     pr(FINAL_RESULT);
                                     break;
                             }
