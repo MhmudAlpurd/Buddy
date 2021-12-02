@@ -284,12 +284,13 @@ public class VoskActivity extends Activity implements
     private void analyze_hypo(String hypothesis){
         String answer;
         String[] res = hypothesis.split("\"");
-
         if(res[3].split(" ").length > 1){
             answer = find_required_madule.find_madule_and_object(res[3]);
+            Log.v("test100", answer);
             String[] result = answer.split("\\|");
             if(result.length > 1) {
                 String MODULE_NAME = result[0];
+                Log.v("test100", MODULE_NAME);
                 switch (MODULE_NAME){
                     case "Text Reading":
                         modulename.setText(result[0] + " module is running!");
@@ -303,17 +304,24 @@ public class VoskActivity extends Activity implements
                         recievedcommand.setText("Recognized command: " + res[3]);
                         img_module.setBackgroundResource(R.drawable.scene_desc);
                         break;
-                case "Finding Object":
-                    modulename.setText(result[0] + " module is running!");
-                    moduletask.setText("Finding the "+ result[1]);
-                    recievedcommand.setText("Recognized command: " + res[3]);
-                    img_module.setBackgroundResource(R.drawable.obj_detection);
-                    break;
-                default:
-                    modulename.setText("Appropriate Module");
-                    moduletask.setText("What Needs To Be Done?");
-                    recievedcommand.setText("Recieved Text From User");
-                    img_module.setBackgroundResource(R.drawable.question);
+                    case "Finding Object":
+                        modulename.setText(result[0] + " module is running!");
+                        moduletask.setText("Finding the "+ result[1]);
+                        recievedcommand.setText("Recognized command: " + res[3]);
+                        img_module.setBackgroundResource(R.drawable.obj_detection);
+                        break;
+
+                    case "Trigger Word":
+                        modulename.setText(result[0] + " module is running!");
+                        moduletask.setText("Buddy is ready");
+                        recievedcommand.setText("Recognized command: " + res[3]);
+                        img_module.setBackgroundResource(R.drawable.buddy_ready);
+                        break;
+                    default:
+                        modulename.setText("No modules enabled");
+                        moduletask.setText(MODULE_NAME);
+                        recievedcommand.setText("Recognized command: " + res[3]);
+                        img_module.setBackgroundResource(R.drawable.question);
 
             }
             }else {
@@ -326,7 +334,7 @@ public class VoskActivity extends Activity implements
     }else {
             modulename.setText("No modules enabled");
             moduletask.setText("Repeat Your Command!");
-            recievedcommand.setText("Recognized command: " + res[3]);
+            recievedcommand.setText("Recognized command: "  + res[3]);
             img_module.setBackgroundResource(R.drawable.question);
     }
     }

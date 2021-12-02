@@ -14,8 +14,13 @@ public class COMMANDREC {
     static String FINAL_MADULE;
     static String FINAL_OBJECT = "Nothing";
     static int FINAL_MADULE_IDX;
-    static String REPEAT_MESSAGE = "Please, Repeat Your Command!";
+    static String REPEAT_MESSAGE = "Repeat Your Command!";
+    static String REPEAT_MESSAGE_2 = "Say, Hey Buddy!";
     static String FINAL_RESULT ;
+    static boolean READY = false;
+    static long startTime;
+    static long endTime;
+    static long activeTime = 15000; //ms
 
     public static void main(String args[]) {
 
@@ -26,8 +31,12 @@ public class COMMANDREC {
 
         String first_word = "" ;
         String second_word = "" ;
-
+        runTriggerWord triggerWord = new runTriggerWord();
         //Main_Keywords
+        //main Trigger word
+        String[] trigger_word_main_keywords ={"hi", "hey"};
+        List<String> trigger_word_main_keywords_lst = Arrays.asList(trigger_word_main_keywords);
+
         String[] text_reading_main_keywords ={"read", "written", "rich", "red", "reach", "write"};
         List<String> text_reading_main_keyworks_lst = Arrays.asList(text_reading_main_keywords);
 
@@ -39,10 +48,14 @@ public class COMMANDREC {
 
 
         // Secondary_Keywords!
+        //secondary Trigger word
+        String[] trigger_word_secondary_keywords ={"buddy", "body", "by"};
+        List<String> trigger_word_secondary_keywords_lst = Arrays.asList(trigger_word_secondary_keywords);
+
         String[] text_reading_secondary_keywords = {"cash", "call", "label", "catch", "card", "court", "labor", "labour"};
         List<String> text_reading_secondary_keywords_lst = Arrays.asList(text_reading_secondary_keywords);
 
-        String[] finding_object_secondary_keyworkds = {"is", "my"};
+        String[] finding_object_secondary_keyworkds = {"is", "my", "the"};
         List<String> finding_object_secondary_keyworkds_lst = Arrays.asList(finding_object_secondary_keyworkds);
 
         String[] scene_description_secondary_keywords = {"it", "me"};
@@ -50,7 +63,7 @@ public class COMMANDREC {
 
 
         //MADULES LIST
-        String[] madules_names = {"Text Reading", "Finding Object", "Scene Description"};
+        String[] madules_names = {"Text Reading", "Finding Object", "Scene Description", "Trigger Word"};
         List<String> madules_names_lst = Arrays.asList(madules_names);
 
 
@@ -60,12 +73,14 @@ public class COMMANDREC {
         main_lst_names_lst.add(text_reading_main_keyworks_lst);
         main_lst_names_lst.add(finding_object_main_keyworks_lst);
         main_lst_names_lst.add(scene_description_main_keyworks_lst);
+        main_lst_names_lst.add(trigger_word_main_keywords_lst);
 
         //List of seondary lists name
         List<List<String>> secondary_lst_names_lst = new ArrayList<>();
         secondary_lst_names_lst.add(text_reading_secondary_keywords_lst);
         secondary_lst_names_lst.add(finding_object_secondary_keyworkds_lst);
         secondary_lst_names_lst.add(scene_description_secondary_keywords_lst);
+        secondary_lst_names_lst.add(trigger_word_secondary_keywords_lst);
 
 
 
@@ -85,10 +100,19 @@ public class COMMANDREC {
 
         //length of result word list.
         int result_words_len = result_words_lst.size();
+        READY = triggerWord.recTriggerWord(result_words_lst);
+        if(READY){
+            startTime = new Date().getTime();
+        }
 
+
+        endTime = new Date().getTime();
+        long time = endTime - startTime;
+        Log.v("test100", time + " time");
         // Find the Madule
-        if(result_words_len >= 2){
+        if(result_words_len >= 2 && time < activeTime){
             first_word = result_words_lst.get(0).toLowerCase().trim();
+            Log.v("test0101", first_word);
 
             // the  main lists include the first word?
             int idx_1 = find_madule_index(main_lst_names_lst, first_word);
@@ -127,12 +151,13 @@ public class COMMANDREC {
                     //just search in same category of secondary lists and main lists.
                     pr("double_check_section");
                     int response = double_check(result_words_lst, first_word , secondary_lst_names_lst, idx_1);
+                    Log.v("test0101", response+"");
                     pr("response" + response);
                     pr("firstword: "+ first_word);
                     switch(response){
                         case -1:
                             pr(REPEAT_MESSAGE);
-                            FINAL_RESULT = REPEAT_MESSAGE;
+                            FINAL_RESULT = REPEAT_MESSAGE + "|" + "nothing" ;
                             break;
                         default:
                             FINAL_MADULE = madules_names[FINAL_MADULE_IDX];
@@ -143,7 +168,7 @@ public class COMMANDREC {
                     break;
             }
         }else{
-            FINAL_RESULT = REPEAT_MESSAGE;
+            FINAL_RESULT = REPEAT_MESSAGE_2 + "|" + " nothing" ;;
             pr(FINAL_RESULT);
         }
 
@@ -167,7 +192,6 @@ public class COMMANDREC {
         MAIN_LST_INDX = -1; //because index is started from zero. and in the next steps we have MAIN_LST_INDX =+1
         Found_MADULE = false;
         Selected_Madule_index = 0;
-
         for(List i: lst_keywords){
             MAIN_LST_INDX += 1 ;
             if(i.contains(word)){
@@ -235,6 +259,18 @@ public class COMMANDREC {
             not_found = -1;
         }
         return not_found;
+    }
+
+    public static void setTimeout(Runnable runnable, int delay){
+        new Thread(() -> {
+            try {
+                Thread.sleep(delay);
+                runnable.run();
+            }
+            catch (Exception e){
+                System.err.println(e);
+            }
+        }).start();
     }
 
 
